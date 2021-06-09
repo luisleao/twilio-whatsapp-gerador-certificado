@@ -338,7 +338,7 @@
                   "{{flow.variables.palavra}}"
                 ],
                 "type": "regex",
-                "value": "^(demo|escala|pizza|pydata|livecoding|rladies)$"
+                "value": "^(demo|CHAVE2)$"
               }
             ]
           }
