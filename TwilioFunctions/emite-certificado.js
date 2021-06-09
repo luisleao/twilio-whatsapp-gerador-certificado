@@ -9,7 +9,7 @@ exports.handler = async function(context, event, callback) {
     let nome = event.nome.trim();
 
   const client = context.getTwilioClient();
-  const urlPdf=encodeURI(`https://certificado-5264.twil.io/pdf?nome=${nome}&palestra=${event.palestra}&duracao=${event.duracao}`)
+  const urlPdf=encodeURI(`https://URL_TWILIO_FUNCTION.twil.io/pdf?nome=${nome}&palestra=${event.palestra}&duracao=${event.duracao}`)
   let resultado = await client.messages.create({
       from: event.to, // número da Sandbox do WhatsApp
       to: event.from,
