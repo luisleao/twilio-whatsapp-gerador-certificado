@@ -5,6 +5,9 @@ Este projeto utiliza a API de WhatsApp da Twilio e a Twilio Functions para valid
 Ele foi utilizado como demonstração na The Developer's Conference, realizada nos dias 8 a 10 de Junho de 2021. A proposta é que ele sirva como ferramenta aberta para geração de certificados de eventos pelas comunidades de pessoas desenvolvedoras.
 
 
+![Tela do WhatsApp com exemplo funcional](./Images/demo-certificado.png)
+
+
 ## Como contribuir com esse projeto?
 
 Se você quer contribuir com esse projeto, entre em contato com lleao@twilio.com
