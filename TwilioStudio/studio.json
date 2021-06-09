@@ -1,0 +1,474 @@
+{
+    "description": "A New Flow",
+    "states": [
+      {
+        "name": "Trigger",
+        "type": "trigger",
+        "transitions": [
+          {
+            "next": "body-strip",
+            "event": "incomingMessage"
+          },
+          {
+            "event": "incomingCall"
+          },
+          {
+            "event": "incomingRequest"
+          }
+        ],
+        "properties": {
+          "offset": {
+            "x": 100,
+            "y": -660
+          }
+        }
+      },
+      {
+        "name": "palavra-chave",
+        "type": "send-and-wait-for-reply",
+        "transitions": [
+          {
+            "next": "set-palavra-resp",
+            "event": "incomingMessage"
+          },
+          {
+            "next": "sem-palavra-chave",
+            "event": "timeout"
+          },
+          {
+            "event": "deliveryFailure"
+          }
+        ],
+        "properties": {
+          "offset": {
+            "x": -90,
+            "y": 220
+          },
+          "service": "{{trigger.message.InstanceSid}}",
+          "channel": "{{trigger.message.ChannelSid}}",
+          "from": "{{flow.channel.address}}",
+          "body": "Qual a palavra-chave do evento?",
+          "timeout": "60"
+        }
+      },
+      {
+        "name": "nome",
+        "type": "send-and-wait-for-reply",
+        "transitions": [
+          {
+            "next": "confirmacao",
+            "event": "incomingMessage"
+          },
+          {
+            "next": "sem-nome",
+            "event": "timeout"
+          },
+          {
+            "event": "deliveryFailure"
+          }
+        ],
+        "properties": {
+          "offset": {
+            "x": 470,
+            "y": 1190
+          },
+          "service": "{{trigger.message.InstanceSid}}",
+          "channel": "{{trigger.message.ChannelSid}}",
+          "from": "{{flow.channel.address}}",
+          "body": "Como você se chama?",
+          "timeout": "120"
+        }
+      },
+      {
+        "name": "boas-vindas",
+        "type": "send-message",
+        "transitions": [
+          {
+            "next": "palavra-chave",
+            "event": "sent"
+          },
+          {
+            "event": "failed"
+          }
+        ],
+        "properties": {
+          "offset": {
+            "x": 10,
+            "y": -30
+          },
+          "service": "{{trigger.message.InstanceSid}}",
+          "channel": "{{trigger.message.ChannelSid}}",
+          "from": "{{flow.channel.address}}",
+          "to": "{{contact.channel.address}}",
+          "body": "Boas-vindas da Twilio.\n\nPara emitir seu certificado de participação do evento, você precisa informar alguns dados.\n\n**{{flow.variables.palavra}}**"
+        }
+      },
+      {
+        "name": "mensagem-verificar-palavra",
+        "type": "send-message",
+        "transitions": [
+          {
+            "next": "verifica-palavra-chave",
+            "event": "sent"
+          },
+          {
+            "event": "failed"
+          }
+        ],
+        "properties": {
+          "offset": {
+            "x": 640,
+            "y": 510
+          },
+          "service": "{{trigger.message.InstanceSid}}",
+          "channel": "{{trigger.message.ChannelSid}}",
+          "from": "{{flow.channel.address}}",
+          "to": "{{contact.channel.address}}",
+          "body": "Um momento enquanto verifico sua palavra-chave..."
+        }
+      },
+      {
+        "name": "sem-palavra-chave",
+        "type": "send-message",
+        "transitions": [
+          {
+            "event": "sent"
+          },
+          {
+            "event": "failed"
+          }
+        ],
+        "properties": {
+          "offset": {
+            "x": -10,
+            "y": 680
+          },
+          "service": "{{trigger.message.InstanceSid}}",
+          "channel": "{{trigger.message.ChannelSid}}",
+          "from": "{{flow.channel.address}}",
+          "to": "{{contact.channel.address}}",
+          "body": "Para emitir seu certificado, você precisa informar uma palavra-chave. Comece o processo novamente."
+        }
+      },
+      {
+        "name": "verifica-palavra-chave",
+        "type": "run-function",
+        "transitions": [
+          {
+            "next": "nome",
+            "event": "success"
+          },
+          {
+            "next": "fail-verifica-palavra",
+            "event": "fail"
+          }
+        ],
+        "properties": {
+          "service_sid": "ZS41eb7d09ff28b4270c86f15b7d61b023",
+          "environment_sid": "ZE4bdd29a5ccff201ec2c4365fb9180d80",
+          "offset": {
+            "x": 570,
+            "y": 740
+          },
+          "function_sid": "ZHb69b4a5a165173a789df50d044fedb39",
+          "parameters": [
+            {
+              "value": "{{flow.variables.palavra}}",
+              "key": "palavraChave"
+            }
+          ],
+          "url": "https://certificado-5264.twil.io/verifica-palavra-chave"
+        }
+      },
+      {
+        "name": "fail-verifica-palavra",
+        "type": "send-message",
+        "transitions": [
+          {
+            "next": "palavra-chave",
+            "event": "sent"
+          },
+          {
+            "event": "failed"
+          }
+        ],
+        "properties": {
+          "offset": {
+            "x": 720,
+            "y": 960
+          },
+          "service": "{{trigger.message.InstanceSid}}",
+          "channel": "{{trigger.message.ChannelSid}}",
+          "from": "{{flow.channel.address}}",
+          "to": "{{contact.channel.address}}",
+          "body": "A palavra-chave informada está inválida.\nTente novamente por favor!"
+        }
+      },
+      {
+        "name": "confirmacao",
+        "type": "send-message",
+        "transitions": [
+          {
+            "next": "aguarde",
+            "event": "sent"
+          },
+          {
+            "event": "failed"
+          }
+        ],
+        "properties": {
+          "offset": {
+            "x": 180,
+            "y": 1430
+          },
+          "service": "{{trigger.message.InstanceSid}}",
+          "channel": "{{trigger.message.ChannelSid}}",
+          "from": "{{flow.channel.address}}",
+          "to": "{{contact.channel.address}}",
+          "body": "Entendi. Vou emitir o certificado para *{{widgets.nome.inbound.Body}} * \n\nCom a seguinte palestra:\n*{{widgets.verifica-palavra-chave.parsed.palestra}}*."
+        }
+      },
+      {
+        "name": "aguarde",
+        "type": "send-message",
+        "transitions": [
+          {
+            "next": "emite-certificado",
+            "event": "sent"
+          },
+          {
+            "event": "failed"
+          }
+        ],
+        "properties": {
+          "offset": {
+            "x": 70,
+            "y": 1660
+          },
+          "service": "{{trigger.message.InstanceSid}}",
+          "channel": "{{trigger.message.ChannelSid}}",
+          "from": "{{flow.channel.address}}",
+          "to": "{{contact.channel.address}}",
+          "body": "Aguarde enquanto seu certificado está sendo gerado..."
+        }
+      },
+      {
+        "name": "emite-certificado",
+        "type": "run-function",
+        "transitions": [
+          {
+            "event": "success"
+          },
+          {
+            "next": "erro-certificado",
+            "event": "fail"
+          }
+        ],
+        "properties": {
+          "service_sid": "ZS41eb7d09ff28b4270c86f15b7d61b023",
+          "environment_sid": "ZE4bdd29a5ccff201ec2c4365fb9180d80",
+          "offset": {
+            "x": 30,
+            "y": 1920
+          },
+          "function_sid": "ZHea270fb2158a8bc7b1f81a5578113cba",
+          "parameters": [
+            {
+              "value": "{{widgets.nome.inbound.Body}}",
+              "key": "nome"
+            },
+            {
+              "value": "{{widgets.verifica-palavra-chave.parsed.palestra}}",
+              "key": "palestra"
+            },
+            {
+              "value": "{{trigger.message.From}}",
+              "key": "from"
+            },
+            {
+              "value": "{{trigger.message.To}}",
+              "key": "to"
+            },
+            {
+              "value": "{{widgets.verifica-palavra-chave.parsed.duracao}}",
+              "key": "duracao"
+            }
+          ],
+          "url": "https://certificado-5264.twil.io/emite-certificado"
+        }
+      },
+      {
+        "name": "erro-certificado",
+        "type": "send-message",
+        "transitions": [
+          {
+            "event": "sent"
+          },
+          {
+            "event": "failed"
+          }
+        ],
+        "properties": {
+          "offset": {
+            "x": 160,
+            "y": 2180
+          },
+          "service": "{{trigger.message.InstanceSid}}",
+          "channel": "{{trigger.message.ChannelSid}}",
+          "from": "{{flow.channel.address}}",
+          "to": "{{contact.channel.address}}",
+          "body": "Infelizmente ocorreu um erro ao emitir seu certificado. Tente novamente mais tarde."
+        }
+      },
+      {
+        "name": "verifica-palavra",
+        "type": "split-based-on",
+        "transitions": [
+          {
+            "next": "boas-vindas",
+            "event": "noMatch"
+          },
+          {
+            "next": "boas-vindas-pronto",
+            "event": "match",
+            "conditions": [
+              {
+                "friendly_name": "If value regex ^(fspon|chatbot|segment|skynet|comunidades)$",
+                "arguments": [
+                  "{{flow.variables.palavra}}"
+                ],
+                "type": "regex",
+                "value": "^(demo|escala|pizza|pydata|livecoding|rladies)$"
+              }
+            ]
+          }
+        ],
+        "properties": {
+          "input": "{{flow.variables.palavra}}",
+          "offset": {
+            "x": 190,
+            "y": -280
+          }
+        }
+      },
+      {
+        "name": "set-palavra-resp",
+        "type": "set-variables",
+        "transitions": [
+          {
+            "next": "mensagem-verificar-palavra",
+            "event": "next"
+          }
+        ],
+        "properties": {
+          "variables": [
+            {
+              "value": "{{widgets.palavra-chave.inbound.Body | strip | downcase}}",
+              "key": "palavra"
+            }
+          ],
+          "offset": {
+            "x": -380,
+            "y": 450
+          }
+        }
+      },
+      {
+        "name": "boas-vindas-pronto",
+        "type": "send-message",
+        "transitions": [
+          {
+            "next": "mensagem-verificar-palavra",
+            "event": "sent"
+          },
+          {
+            "event": "failed"
+          }
+        ],
+        "properties": {
+          "offset": {
+            "x": 610,
+            "y": -70
+          },
+          "service": "{{trigger.message.InstanceSid}}",
+          "channel": "{{trigger.message.ChannelSid}}",
+          "from": "{{flow.channel.address}}",
+          "to": "{{contact.channel.address}}",
+          "body": "Boas-vindas da Twilio.\n\nPara emitir seu certificado de participação do evento, você precisa informar alguns dados."
+        }
+      },
+      {
+        "name": "body-strip",
+        "type": "set-variables",
+        "transitions": [
+          {
+            "next": "verifica-palavra",
+            "event": "next"
+          }
+        ],
+        "properties": {
+          "variables": [
+            {
+              "value": "{{trigger.message.Body | strip | downcase }}",
+              "key": "palavra"
+            }
+          ],
+          "offset": {
+            "x": 140,
+            "y": -500
+          }
+        }
+      },
+      {
+        "name": "sem-nome",
+        "type": "send-message",
+        "transitions": [
+          {
+            "next": "reset-nome",
+            "event": "sent"
+          },
+          {
+            "event": "failed"
+          }
+        ],
+        "properties": {
+          "offset": {
+            "x": 570,
+            "y": 1460
+          },
+          "service": "{{trigger.message.InstanceSid}}",
+          "channel": "{{trigger.message.ChannelSid}}",
+          "from": "{{flow.channel.address}}",
+          "to": "{{contact.channel.address}}",
+          "body": "Para emitir seu certificado, você precisa informar seu nome completo em até 2 minutos."
+        }
+      },
+      {
+        "name": "reset-nome",
+        "type": "send-message",
+        "transitions": [
+          {
+            "event": "sent"
+          },
+          {
+            "event": "failed"
+          }
+        ],
+        "properties": {
+          "offset": {
+            "x": 680,
+            "y": 1710
+          },
+          "service": "{{trigger.message.InstanceSid}}",
+          "channel": "{{trigger.message.ChannelSid}}",
+          "from": "{{flow.channel.address}}",
+          "to": "{{contact.channel.address}}",
+          "body": "Comece o processo novamente!"
+        }
+      }
+    ],
+    "initial_state": "Trigger",
+    "flags": {
+      "allow_concurrent_calls": true
+    }
+  }
